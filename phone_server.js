@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: true}));
 
 var WELCOME_MESSAGE = "Welcome to the number guessing hotline.";
@@ -61,18 +62,27 @@ function requestGuess(request, r, randomNumber) {
   var guessPromptParams = {
     'action': guessActionUrl(request, randomNumber),
     'method': 'POST',
-    'timeout': '8',
+    'timeout': '10',
     'numDigits': '2',
     'retries': '3'
   };
 
   var getDigits = r.addGetDigits(guessPromptParams);
   getDigits.addSpeak(GUESS_PROMPT);
+  getDigits.addPlay(holdMusicUrl(request));
   r.addSpeak(WRONG_INPUT_MESSAGE);
 }
 
+function serverUrl(request) {
+  return request.protocol + '://' + request.headers.host;
+}
+
 function guessActionUrl(request, randomNumber) {
-  return request.protocol + '://' + request.headers.host + '/guess?number=' + randomNumber;
+  return serverUrl(request) + '/guess?number=' + randomNumber;
+}
+
+function holdMusicUrl(request) {
+  return serverUrl(request) + '/elevator_music.mp3';
 }
 
 function findRandomNumber(min, max) {
