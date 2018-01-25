@@ -15,19 +15,10 @@ var WON_MESSAGE = "You're the best! Congrats!"
 
 app.get('/', function(request, response) {
   var randomNumber = findRandomNumber(1, 99);
-  var guessActionUrl = request.protocol + '://' + request.headers.host + '/guess?number=' + randomNumber;
 
   var r = plivo.Response();
-  params = {
-    'action': guessActionUrl,
-    'method': 'POST',
-    'timeout': '7',
-    'numDigits': '2',
-    'retries': '1'
-  };
-  getDigits = r.addGetDigits(params);
-  getDigits.addSpeak(WELCOME_MESSAGE);
-  r.addSpeak(WRONG_INPUT_MESSAGE);
+  r.addSpeak(WELCOME_MESSAGE);
+  requestGuess(request, r, randomNumber);
 
   response.set({'Content-Type': 'text/xml'});
   response.send(r.toXML());
@@ -38,17 +29,24 @@ app.post('/guess', function(request, response) {
   var randomNumber = parseInt(request.query.number);
   var guess = parseInt(request.body.Digits);
 
-  if (guess > randomNumber) {
-    r.addSpeak(TOO_HIGH_MESSAGE);
-    // TODO: Ask for input.
-  } else if (guess < randomNumber) {
-    r.addSpeak(TOO_LOW_MESSAGE);
-    // TODO: Ask for input again.
-  } else if (guess !== undefined && guess === randomNumber) {
+  var won = guess !== undefined && guess === randomNumber;
+
+  console.log('The player guessed: ' + guess);
+  console.log('The actual number is: ' + randomNumber)
+
+  if (won) {
     r.addSpeak(WON_MESSAGE);
-    // TODO: Hang up?
+    // TODO: Play music?
   } else {
-    r.addSpeak(WRONG_INPUT_MESSAGE);
+    if (guess > randomNumber) {
+      r.addSpeak(TOO_HIGH_MESSAGE);
+    } else if (guess < randomNumber) {
+      r.addSpeak(TOO_LOW_MESSAGE);
+    } else {
+      r.addSpeak(WRONG_INPUT_MESSAGE);
+    }
+
+    requestGuess(request, r, randomNumber)
   }
 
   response.set({'Content-Type': 'text/xml'});
@@ -58,6 +56,24 @@ app.post('/guess', function(request, response) {
 app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));
 });
+
+function requestGuess(request, r, randomNumber) {
+  var guessPromptParams = {
+    'action': guessActionUrl(request, randomNumber),
+    'method': 'POST',
+    'timeout': '7',
+    'numDigits': '2',
+    'retries': '1'
+  };
+
+  var getDigits = r.addGetDigits(guessPromptParams);
+  getDigits.addSpeak(GUESS_PROMPT);
+  r.addSpeak(WRONG_INPUT_MESSAGE);
+}
+
+function guessActionUrl(request, randomNumber) {
+  return request.protocol + '://' + request.headers.host + '/guess?number=' + randomNumber;
+}
 
 function findRandomNumber(min, max) {
   return Math.floor((Math.random() * max) + min);
