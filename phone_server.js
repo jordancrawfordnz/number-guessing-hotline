@@ -61,9 +61,9 @@ function requestGuess(request, r, randomNumber) {
   var guessPromptParams = {
     'action': guessActionUrl(request, randomNumber),
     'method': 'POST',
-    'timeout': '7',
+    'timeout': '8',
     'numDigits': '2',
-    'retries': '1'
+    'retries': '3'
   };
 
   var getDigits = r.addGetDigits(guessPromptParams);
