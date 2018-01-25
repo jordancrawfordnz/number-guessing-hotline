@@ -82,7 +82,7 @@ function guessActionUrl(request, randomNumber) {
 }
 
 function holdMusicUrl(request) {
-  return serverUrl(request) + '/elevator_music.m4a';
+  return serverUrl(request) + '/elevator_music.mp3';
 }
 
 function findRandomNumber(min, max) {
