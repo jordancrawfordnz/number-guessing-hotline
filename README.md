@@ -1,7 +1,14 @@
 # Number Guessing Hotline
+
+---
+
+**Please note:** This project is not actively maintained, it may no longer work and may depend on out of date dependencies.
+
+---
+
 This was a hackdays project of mine to learn how [Plivo](https://plivo.com) works to link the web world with the phone world.
 
-See [my blog post](https://jordancrawford.kiwi/web-and-phone/) about this for more information.
+See [my blog post](https://jc.kiwi/web-and-phone/) about this for more information.
 
 ## Setup
 Ensure NodeJS is installed on your system before beginning.
